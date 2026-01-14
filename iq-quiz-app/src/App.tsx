@@ -42,6 +42,12 @@ function App() {
     }
   };
 
+  const previousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    }
+  };
+
 
   const restartQuiz = () => {
     setQuestions([]);
@@ -128,9 +134,16 @@ function App() {
             </button>
           ))}
         </div>
-        <button onClick={nextQuestion} disabled={selectedAnswers[currentQuestionIndex] === undefined}>
-          {currentQuestionIndex < questions.length - 1 ? 'Next' : 'Finish'}
-        </button>
+        <div className="navigation-buttons">
+          {currentQuestionIndex > 0 && (
+            <button onClick={previousQuestion}>
+              Previous
+            </button>
+          )}
+          <button onClick={nextQuestion} disabled={selectedAnswers[currentQuestionIndex] === undefined}>
+            {currentQuestionIndex < questions.length - 1 ? 'Next' : 'Finish'}
+          </button>
+        </div>
       </div>
     </div>
   );

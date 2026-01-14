@@ -165,8 +165,13 @@ button {
   color: white;
 }
 
-.share-btn.invite:hover {
-  background: linear-gradient(45deg, #a29bfe, #6c5ce7);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.navigation-buttons button {
+  flex: 1;
+  margin: 0 5px;
 }
