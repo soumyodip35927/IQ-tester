@@ -37,8 +37,12 @@ const MOCK_POOL: Question[] = [
         options: ["Reduce", "Increase", "Plain", "Deduced"], correctIndex: 1, difficulty: 'easy', category: 'logic'
     },
     {
-        id: 'e6', text: "Coffee is to Cup as Cake is to ...?",
-        options: ["Fork", "Plate", "Napkin", "Bowl"], correctIndex: 1, difficulty: 'easy', category: 'logic'
+        id: 'e7', text: "What comes next in the sequence: 1, 4, 9, 16, 25, ...?",
+        options: ["36", "49", "30", "27"], correctIndex: 0, difficulty: 'easy', category: 'math' // Square numbers
+    },
+    {
+        id: 'e8', text: "Book is to Library as Painting is to ...?",
+        options: ["Museum", "Gallery", "Artist", "Frame"], correctIndex: 0, difficulty: 'easy', category: 'logic'
     },
     // --- MEDIUM (Need at least 10 for variety) ---
     {
@@ -66,8 +70,16 @@ const MOCK_POOL: Question[] = [
         options: ["REVIVER", "REMEMBER", "RETURN", "RESTORE"], correctIndex: 0, difficulty: 'medium', category: 'pattern' // Palindromes
     },
     {
-        id: 'm7', text: "Some months have 30 days, others have 31. How many have 28 days?",
-        options: ["1", "12", "6", "February"], correctIndex: 1, difficulty: 'medium', category: 'logic' // All 12 have at least 28.
+        id: 'm8', text: "What is the next number in the sequence: 2, 3, 5, 7, 11, 13, ...?",
+        options: ["15", "17", "19", "23"], correctIndex: 1, difficulty: 'medium', category: 'math' // Prime numbers
+    },
+    {
+        id: 'm9', text: "A lily pad doubles in size every day. If it covers the entire pond in 30 days, when was the pond half covered?",
+        options: ["Day 15", "Day 29", "Day 28", "Day 1"], correctIndex: 1, difficulty: 'medium', category: 'logic'
+    },
+    {
+        id: 'm10', text: "Which of these is not like the others: DOG, CAT, BIRD, FISH, SNAKE?",
+        options: ["DOG", "CAT", "BIRD", "FISH"], correctIndex: 3, difficulty: 'medium', category: 'logic' // Fish doesn't have legs
     },
     // --- HARD (Need at least 10 for variety) ---
     {
@@ -91,29 +103,59 @@ const MOCK_POOL: Question[] = [
         options: ["5", "3", "4", "6"], correctIndex: 0, difficulty: 'hard', category: 'pattern' // Number of letters in the word: One(3), Two(3), Three(5)... Seven(5)
     },
     {
-        id: 'h6', text: "Identify the next number: 61, 52, 63, 94, 46, ...?",
-        options: ["18", "91", "58", "19"], correctIndex: 0, difficulty: 'hard', category: 'pattern' // Reversed squares: 16->61, 25->52, 36->63, 49->94, 64->46. Next 81->18.
-    }
+        id: 'h7', text: "If you have three switches outside a room that control three bulbs inside, and you can flip switches and check bulbs only once each, how can you determine which switch controls which bulb?",
+        options: ["Flip all switches", "Flip one, wait, flip another", "It's impossible", "Use a mirror"], correctIndex: 1, difficulty: 'hard', category: 'logic'
+    },
+    {
+        id: 'h8', text: "What is the next number: 1, 11, 21, 1211, 111221, ...?",
+        options: ["312211", "13112221", "1113213211", "13211311123113112211"], correctIndex: 0, difficulty: 'hard', category: 'pattern' // Look-and-say sequence
+    },
+    {
+        id: 'h9', text: "A man has to transport a wolf, a goat, and a cabbage across a river. He can only take one at a time, and can't leave the wolf with the goat or the goat with the cabbage. How does he do it?",
+        options: ["Take goat first, come back, take wolf, come back with goat, take cabbage, come back, take goat", "Take wolf first", "Take cabbage first", "It's impossible"], correctIndex: 0, difficulty: 'hard', category: 'logic'
+    },
 ];
 export const QuizService = {
     async generateQuiz(count: number = 5): Promise<Question[]> {
         // Simulate AI delay
         await new Promise(resolve => setTimeout(resolve, 800));
+
+        // Get previously used questions from localStorage to avoid repetition
+        const usedQuestions = JSON.parse(localStorage.getItem('usedQuestions') || '[]');
+
         // Desired Structure: 1 Easy, 2 Medium, 2 Hard
-        const easyPool = MOCK_POOL.filter(q => q.difficulty === 'easy');
-        const mediumPool = MOCK_POOL.filter(q => q.difficulty === 'medium');
-        const hardPool = MOCK_POOL.filter(q => q.difficulty === 'hard');
-        // Helper to get random samples
-        const getRandom = (pool: Question[], n: number) => {
+        const easyPool = MOCK_POOL.filter(q => q.difficulty === 'easy' && !usedQuestions.includes(q.id));
+        const mediumPool = MOCK_POOL.filter(q => q.difficulty === 'medium' && !usedQuestions.includes(q.id));
+        const hardPool = MOCK_POOL.filter(q => q.difficulty === 'hard' && !usedQuestions.includes(q.id));
+
+        // If we don't have enough unused questions, reset the used questions list
+        if (easyPool.length < 1 || mediumPool.length < 2 || hardPool.length < 2) {
+            localStorage.setItem('usedQuestions', '[]');
+            return this.generateQuiz(count); // Retry with fresh pool
+        }
+
+        // Helper to get random samples without replacement
+        const getRandomUnique = (pool: Question[], n: number): Question[] => {
             const shuffled = [...pool].sort(() => 0.5 - Math.random());
             return shuffled.slice(0, n);
         };
+
         const selectedQuestions = [
-            ...getRandom(easyPool, 1),
-            ...getRandom(mediumPool, 2),
-            ...getRandom(hardPool, 2)
+            ...getRandomUnique(easyPool, 1),
+            ...getRandomUnique(mediumPool, 2),
+            ...getRandomUnique(hardPool, 2)
         ];
+
+        // Update used questions list
+        const newUsedQuestions = [...usedQuestions, ...selectedQuestions.map(q => q.id)];
+        localStorage.setItem('usedQuestions', JSON.stringify(newUsedQuestions));
+
         return selectedQuestions;
+    },
+
+    // Function to reset used questions (useful for testing or when pool is exhausted)
+    resetUsedQuestions(): void {
+        localStorage.setItem('usedQuestions', '[]');
     },
     calculateIQ(score: number, total: number, timeSeconds: number): QuizResult {
         // Basic heuristic:
