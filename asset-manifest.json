@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/IQ-tester/static/css/main.fbc4cafd.css",
+    "main.js": "/IQ-tester/static/js/main.0b7effcd.js",
+    "static/js/453.ef11aad2.chunk.js": "/IQ-tester/static/js/453.ef11aad2.chunk.js",
+    "index.html": "/IQ-tester/index.html",
+    "main.fbc4cafd.css.map": "/IQ-tester/static/css/main.fbc4cafd.css.map",
+    "main.0b7effcd.js.map": "/IQ-tester/static/js/main.0b7effcd.js.map",
+    "453.ef11aad2.chunk.js.map": "/IQ-tester/static/js/453.ef11aad2.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.fbc4cafd.css",
+    "static/js/main.0b7effcd.js"
+  ]
+}
